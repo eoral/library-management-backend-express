@@ -1,28 +1,23 @@
 import {Request, Response, Router} from "express";
-import {Book} from "../entity/book";
-import {AppDataSource} from "../data-source";
+import BookService from "../service/book-service";
 
 const router = Router();
 
 router.get('/', async (req: Request, res: Response) => {
-    const bookRepository = AppDataSource.getRepository(Book);
-    const books = await bookRepository.find();
+    const books = await BookService.getAllBooks();
     res.json(books);
 });
 
 router.get('/:id', async (req: Request, res: Response) => {
-    const bookRepository = AppDataSource.getRepository(Book);
-    const book = await bookRepository.findOneBy({ id: parseInt(req.params.id) });
+    const id = parseInt(req.params.id);
+    const book = await BookService.getBookById(id);
     res.json(book);
 });
 
 router.post('/', async (req: Request, res: Response) => {
-    const book = new Book();
-    book.name = req.body.name;
-    book.score = -1;
-    const bookRepository = AppDataSource.getRepository(Book);
-    const persistedBook = await bookRepository.save(book);
-    res.json(persistedBook);
+    const name = req.body.name;
+    const book = await BookService.createBook(name);
+    res.json(book);
 });
 
 export default router
