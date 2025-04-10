@@ -19,10 +19,14 @@ class BookService {
     }
 
     async createBook(name: string): Promise<Book> {
+        const bookRepository = AppDataSource.getRepository(Book);
+        const existingBook = await bookRepository.findOneBy({ name: name });
+        if (existingBook) {
+            throw new Error('Already Exists');
+        }
         const book = new Book();
         book.name = name;
         book.score = -1;
-        const bookRepository = AppDataSource.getRepository(Book);
         return await bookRepository.save(book);
     }
 }
