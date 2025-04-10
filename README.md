@@ -13,3 +13,6 @@
 - npm install
 - npm run start
 
+## Notes
+- Node version: v22.14.0
+- Npm version: 10.9.2
