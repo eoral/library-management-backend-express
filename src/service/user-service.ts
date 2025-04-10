@@ -4,7 +4,7 @@ import {User} from "../entity/user";
 import {BookBorrowHistory} from "../entity/book-borrow-history";
 import {BookScore} from "../entity/book-score";
 import {In} from "typeorm";
-import {PastItem, PresentItem} from "../dto/user-query-response";
+import {PastBorrow, PresentBorrow} from "../dto/user-query-response";
 import {PastAndPresentBorrows} from "../dto/past-and-present-borrows";
 
 class UserService {
@@ -68,23 +68,23 @@ class UserService {
         bookScores.forEach(item => {
             bookIdVersusScore.set(item.book.id, item.score);
         });
-        const pastItems: PastItem[] = [];
-        const presentItems: PresentItem[] = [];
+        const pastBorrows: PastBorrow[] = [];
+        const presentBorrows: PresentBorrow[] = [];
         bookBorrowHistories.forEach(item => {
             if (item.returned) {
-                pastItems.push({
+                pastBorrows.push({
                     name: item.book.name,
                     userScore: bookIdVersusScore.get(item.book.id)
                 });
             } else {
-                presentItems.push({
+                presentBorrows.push({
                     name: item.book.name
                 });
             }
         });
         return {
-            past: pastItems,
-            present: presentItems
+            past: pastBorrows,
+            present: presentBorrows
         };
     }
 

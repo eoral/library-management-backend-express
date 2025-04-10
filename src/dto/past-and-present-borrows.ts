@@ -1,6 +1,6 @@
-import {PastItem, PresentItem} from "./user-query-response";
+import {PastBorrow, PresentBorrow} from "./user-query-response";
 
 export interface PastAndPresentBorrows {
-    past?: PastItem[];
-    present?: PresentItem[];
+    past?: PastBorrow[];
+    present?: PresentBorrow[];
 }

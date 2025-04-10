@@ -1,15 +1,15 @@
 export interface UserQueryResponse {
     id?: number;
     name?: string;
-    past?: PastItem[];
-    present?: PresentItem[];
+    past?: PastBorrow[];
+    present?: PresentBorrow[];
 }
 
-export interface PastItem {
+export interface PastBorrow {
     name?: string;
     userScore?: number;
 }
 
-export interface PresentItem {
+export interface PresentBorrow {
     name?: string;
 }
