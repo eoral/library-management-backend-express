@@ -1,19 +1,20 @@
 import {Request, Response, Router} from "express";
-import {UserQueryResponse} from "../dto/user-query-response";
+import {UserWithBooksResponse} from "../dto/user-with-books-response";
 import UserService from "../service/user-service";
+import {fromEntity} from "../dto/user-response";
 
 const router = Router();
 
 router.get('/', async (req: Request, res: Response) => {
     const users = await UserService.getAllUsers();
-    res.json(users);
+    res.json(users.map(user => fromEntity(user)));
 });
 
 router.get('/:id', async (req: Request, res: Response) => {
     const id = parseInt(req.params.id);
     const user = await UserService.getUserById(id);
     const pastAndPresentBorrows = await UserService.getPastAndPresentBorrows(id);
-    const responseBody: UserQueryResponse = {
+    const responseBody: UserWithBooksResponse = {
         id: user.id,
         name: user.name,
         books: {
@@ -27,7 +28,7 @@ router.get('/:id', async (req: Request, res: Response) => {
 router.post('/', async (req: Request, res: Response) => {
     const name = req.body.name;
     const user = await UserService.createUser(name);
-    res.json(user);
+    res.json(fromEntity(user));
 });
 
 router.post('/:userId/borrow/:bookId', async (req: Request, res: Response) => {

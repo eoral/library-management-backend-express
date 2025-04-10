@@ -1,10 +1,10 @@
-export interface UserQueryResponse {
+export interface UserWithBooksResponse {
     id?: number;
     name?: string;
-    books?: Books;
+    books?: PastAndPresentBorrows;
 }
 
-export interface Books {
+export interface PastAndPresentBorrows {
     past?: PastBorrow[];
     present?: PresentBorrow[];
 }

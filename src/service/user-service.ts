@@ -4,8 +4,7 @@ import {User} from "../entity/user";
 import {BookBorrowHistory} from "../entity/book-borrow-history";
 import {BookScore} from "../entity/book-score";
 import {In} from "typeorm";
-import {PastBorrow, PresentBorrow} from "../dto/user-query-response";
-import {PastAndPresentBorrows} from "../dto/past-and-present-borrows";
+import {PastAndPresentBorrows, PastBorrow, PresentBorrow} from "../dto/user-with-books-response";
 import {Book} from "../entity/book";
 
 class UserService {
