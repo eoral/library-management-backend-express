@@ -18,4 +18,6 @@ export class BookBorrowHistory {
 
     @Column()
     returned!: boolean;
+
+    // TODO: It is better to add timestamps.
 }

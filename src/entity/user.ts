@@ -8,4 +8,6 @@ export class User {
 
     @Column()
     name!: string;
+    
+    // TODO: It is better to add timestamps.
 }

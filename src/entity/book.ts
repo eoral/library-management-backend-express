@@ -11,4 +11,6 @@ export class Book {
 
     @Column("float")
     score!: number;
+
+    // TODO: It is better to add timestamps.
 }
