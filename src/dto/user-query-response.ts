@@ -1,6 +1,10 @@
 export interface UserQueryResponse {
     id?: number;
     name?: string;
+    books?: Books;
+}
+
+export interface Books {
     past?: PastBorrow[];
     present?: PresentBorrow[];
 }

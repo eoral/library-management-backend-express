@@ -16,8 +16,10 @@ router.get('/:id', async (req: Request, res: Response) => {
     const responseBody: UserQueryResponse = {
         id: user.id,
         name: user.name,
-        past: pastAndPresentBorrows.past,
-        present: pastAndPresentBorrows.present
+        books: {
+            past: pastAndPresentBorrows.past,
+            present: pastAndPresentBorrows.present
+        }
     };
     res.json(responseBody);
 });
