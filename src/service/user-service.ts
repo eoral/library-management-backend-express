@@ -69,13 +69,17 @@ class UserService {
             bookIdVersusScore.set(item.book.id, item.score);
         });
         const pastBorrows: PastBorrow[] = [];
+        const pastBorrowBookIds = new Set<number>();
         const presentBorrows: PresentBorrow[] = [];
         bookBorrowHistories.forEach(item => {
             if (item.returned) {
-                pastBorrows.push({
-                    name: item.book.name,
-                    userScore: bookIdVersusScore.get(item.book.id)
-                });
+                if (!pastBorrowBookIds.has(item.book.id)) {
+                    pastBorrows.push({
+                        name: item.book.name,
+                        userScore: bookIdVersusScore.get(item.book.id)
+                    });
+                    pastBorrowBookIds.add(item.book.id);
+                }
             } else {
                 presentBorrows.push({
                     name: item.book.name
