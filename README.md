@@ -3,7 +3,12 @@
 ## How to create an empty DB 
 - docker pull postgres
 - docker run -d --name library-management-db -p 5432:5432 -e POSTGRES_PASSWORD=pass123 postgres
-- Connect to the DB using SQL client of your choice. I am using DBeaver.
+- Connect to the DB using SQL client of your choice. I am using DBeaver. Connection params:
+  - DB_HOST=localhost
+  - DB_PORT=5432
+  - DB_USERNAME=postgres
+  - DB_PASSWORD=pass123
+  - DB_NAME=postgres
 - Go to ddl-script.sql. Execute it using your SQL client.
 - Go to dml-script.sql. Execute it using your SQL client.
 
