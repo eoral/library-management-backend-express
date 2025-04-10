@@ -12,7 +12,7 @@ export const AppDataSource = new DataSource({
     username: "postgres",
     password: "pass123",
     database: "postgres",
-    synchronize: true,
+    synchronize: false,
     logging: true,
     entities: [User, Book, BookBorrowHistory, BookScore],
     subscribers: [],
