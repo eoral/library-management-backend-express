@@ -1,10 +1,5 @@
 import {Request, Response, Router} from "express";
-import {AppDataSource} from "../data-source";
-import {User} from "../entity/user";
-import {BookBorrowHistory} from "../entity/book-borrow-history";
-import {BookScore} from "../entity/book-score";
-import {In} from "typeorm";
-import {PastItem, PresentItem, UserQueryResponse} from "../dto/user-query-response";
+import {UserQueryResponse} from "../dto/user-query-response";
 import UserService from "../service/user-service";
 
 const router = Router();
@@ -16,54 +11,13 @@ router.get('/', async (req: Request, res: Response) => {
 
 router.get('/:id', async (req: Request, res: Response) => {
     const id = parseInt(req.params.id);
-    const userRepository = AppDataSource.getRepository(User);
-    const user = await userRepository.findOneBy({ id: id });
-    const bookBorrowHistoryRepository = AppDataSource.getRepository(BookBorrowHistory);
-    const bookBorrowHistories = await bookBorrowHistoryRepository.find({
-        where: {
-            user: { id: id },
-        },
-        relations: {
-            book: true,
-        }
-    });
-    console.log(bookBorrowHistories);
-    const borrowedBookIds = bookBorrowHistories.map(item => item.book.id);
-    const bookScoreRepository = AppDataSource.getRepository(BookScore);
-    const bookScores = await bookScoreRepository.find({
-        where: {
-            user: { id: id },
-            book: { id: In(borrowedBookIds) }
-        },
-        relations: {
-            book: true,
-        }
-    });
-    console.log(bookScores);
-    console.log(bookScores.map(item => item.book.id));
-    const bookIdVersusScore = new Map<number, number>();
-    bookScores.forEach(item => {
-        bookIdVersusScore.set(item.book.id, item.score);
-    });
-    const pastItems: PastItem[] = [];
-    const presentItems: PresentItem[] = [];
-    bookBorrowHistories.forEach(item => {
-        if (item.returned) {
-            pastItems.push({
-                name: item.book.name,
-                userScore: bookIdVersusScore.get(item.book.id)
-            });
-        } else {
-            presentItems.push({
-                name: item.book.name
-            });
-        }
-    });
+    const user = await UserService.getUserById(id);
+    const pastAndPresentBorrows = await UserService.getPastAndPresentBorrows(id);
     const responseBody: UserQueryResponse = {
-        id: user?.id,
-        name: user?.name,
-        past: pastItems,
-        present: presentItems
+        id: user.id,
+        name: user.name,
+        past: pastAndPresentBorrows.past,
+        present: pastAndPresentBorrows.present
     };
     res.json(responseBody);
 });

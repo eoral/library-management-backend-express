@@ -3,6 +3,9 @@ import BookService from "./book-service";
 import {User} from "../entity/user";
 import {BookBorrowHistory} from "../entity/book-borrow-history";
 import {BookScore} from "../entity/book-score";
+import {In} from "typeorm";
+import {PastItem, PresentItem} from "../dto/user-query-response";
+import {PastAndPresentBorrows} from "../dto/past-and-present-borrows";
 
 class UserService {
 
@@ -30,6 +33,59 @@ class UserService {
         const user = new User();
         user.name = name;
         return await userRepository.save(user);
+    }
+
+    async getBookBorrowHistories(userId: number): Promise<BookBorrowHistory[]> {
+        const bookBorrowHistoryRepository = AppDataSource.getRepository(BookBorrowHistory);
+        return await bookBorrowHistoryRepository.find({
+            where: {
+                user: { id: userId }
+            },
+            relations: {
+                book: true
+            }
+        });
+    }
+
+    async getBookScores(userId: number, bookIds: number[]): Promise<BookScore[]> {
+        const bookScoreRepository = AppDataSource.getRepository(BookScore);
+        return await bookScoreRepository.find({
+            where: {
+                user: { id: userId },
+                book: { id: In(bookIds) }
+            },
+            relations: {
+                book: true
+            }
+        });
+    }
+
+    async getPastAndPresentBorrows(userId: number): Promise<PastAndPresentBorrows> {
+        const bookBorrowHistories = await this.getBookBorrowHistories(userId);
+        const borrowedBookIds = bookBorrowHistories.map(item => item.book.id);
+        const bookScores = await this.getBookScores(userId, borrowedBookIds);
+        const bookIdVersusScore = new Map<number, number>();
+        bookScores.forEach(item => {
+            bookIdVersusScore.set(item.book.id, item.score);
+        });
+        const pastItems: PastItem[] = [];
+        const presentItems: PresentItem[] = [];
+        bookBorrowHistories.forEach(item => {
+            if (item.returned) {
+                pastItems.push({
+                    name: item.book.name,
+                    userScore: bookIdVersusScore.get(item.book.id)
+                });
+            } else {
+                presentItems.push({
+                    name: item.book.name
+                });
+            }
+        });
+        return {
+            past: pastItems,
+            present: presentItems
+        };
     }
 
     async getNotReturnedBookBorrowHistory(bookId: number, userId: number): Promise<BookBorrowHistory | null> {
