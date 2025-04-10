@@ -38,7 +38,7 @@ router.post('/:userId/borrow/:bookId', async (req: Request, res: Response) => {
 router.post('/:userId/return/:bookId', async (req: Request, res: Response) => {
     const userId = parseInt(req.params.userId);
     const bookId = parseInt(req.params.bookId);
-    const score = parseInt(req.body.score);
+    const score = parseFloat(req.body.score);
     await UserService.returnBook(bookId, userId, score);
     res.json();
 });
