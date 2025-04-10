@@ -1,7 +1,6 @@
 import express from 'express';
 import dotenv from 'dotenv';
 import {AppDataSource} from "./data-source";
-import {default as testRouter} from "./router/test-router";
 import {default as bookRouter} from "./router/book-router";
 import {default as userRouter} from "./router/user-router";
 
@@ -16,7 +15,6 @@ AppDataSource.initialize()
         const port = process.env.PORT || 3000;
         const app = express();
         app.use(express.json());
-        app.use('/tests', testRouter);
         app.use('/books', bookRouter);
         app.use('/users', userRouter);
         app.listen(port, () => {
