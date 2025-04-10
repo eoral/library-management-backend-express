@@ -1,5 +1,4 @@
 import {Request, Response, Router} from "express";
-import {Book} from "../entity/book";
 import {AppDataSource} from "../data-source";
 import {User} from "../entity/user";
 import {BookBorrowHistory} from "../entity/book-borrow-history";
@@ -70,11 +69,9 @@ router.get('/:id', async (req: Request, res: Response) => {
 });
 
 router.post('/', async (req: Request, res: Response) => {
-    const user = new User();
-    user.name = req.body.name;
-    const userRepository = AppDataSource.getRepository(User);
-    const persistedUser = await userRepository.save(user);
-    res.json(persistedUser);
+    const name = req.body.name;
+    const user = await UserService.createUser(name);
+    res.json(user);
 });
 
 router.post('/:userId/borrow/:bookId', async (req: Request, res: Response) => {

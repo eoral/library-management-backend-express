@@ -21,6 +21,17 @@ class UserService {
         }
     }
 
+    async createUser(name: string): Promise<User> {
+        const userRepository = AppDataSource.getRepository(User);
+        const existingUser = await userRepository.findOneBy({ name: name });
+        if (existingUser) {
+            throw new Error('Already Exists');
+        }
+        const user = new User();
+        user.name = name;
+        return await userRepository.save(user);
+    }
+
     async getNotReturnedBookBorrowHistory(bookId: number, userId: number): Promise<BookBorrowHistory | null> {
         const bookBorrowHistoryRepository = AppDataSource.getRepository(BookBorrowHistory);
         return await bookBorrowHistoryRepository.findOneBy({
