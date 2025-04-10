@@ -6,6 +6,7 @@ import {BookScore} from "../entity/book-score";
 import {In} from "typeorm";
 import {PastBorrow, PresentBorrow} from "../dto/user-query-response";
 import {PastAndPresentBorrows} from "../dto/past-and-present-borrows";
+import {Book} from "../entity/book";
 
 class UserService {
 
@@ -112,6 +113,27 @@ class UserService {
         await bookBorrowHistoryRepository.save(bookBorrowHistory);
     }
 
+    async getExistingBookScoreOrElseCreateNew(bookId: number, userId: number): Promise<BookScore> {
+        const bookScoreRepository = AppDataSource.getRepository(BookScore);
+        const existingBookScore = await bookScoreRepository.findOneBy({
+            book: { id: bookId },
+            user: { id: userId }
+        });
+        if (existingBookScore) {
+            return existingBookScore;
+        } else {
+            const book = new Book();
+            book.id = bookId;
+            const user = new User();
+            user.id = userId;
+            const bookScore = new BookScore();
+            bookScore.book = book;
+            bookScore.user = user;
+            bookScore.score = -1;
+            return bookScore;
+        }
+    }
+
     // It is better to consider thread-safety in this method.
     async calculateNewScore(bookId: number, additionalScore: number): Promise<number> {
         const bookScoreRepository = AppDataSource.getRepository(BookScore);
@@ -135,9 +157,7 @@ class UserService {
         // DB change-1
         bookBorrowHistory.returned = true;
         // DB change-2
-        const bookScore = new BookScore();
-        bookScore.book = book;
-        bookScore.user = user;
+        const bookScore = await this.getExistingBookScoreOrElseCreateNew(bookId, userId);
         bookScore.score = score;
         // DB change-3
         book.score = await this.calculateNewScore(bookId, score);
