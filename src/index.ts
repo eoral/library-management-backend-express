@@ -1,8 +1,11 @@
 import express from 'express';
+import dotenv from 'dotenv';
 import {AppDataSource} from "./data-source";
 import {default as testRouter} from "./router/test-router";
 import {default as bookRouter} from "./router/book-router";
 import {default as userRouter} from "./router/user-router";
+
+dotenv.config();
 
 // to initialize the initial connection with the database, register all entities
 // and "synchronize" database schema, call "initialize()" method of a newly created database
