@@ -20,6 +20,7 @@ CREATE TABLE public.book_borrow_history
 );
 
 CREATE INDEX idx_bbh_book_and_user ON public.book_borrow_history (book_id, user_id);
+CREATE UNIQUE INDEX idx_bbh_book_and_not_returned ON public.book_borrow_history (book_id, returned) WHERE (returned = false);
 
 CREATE TABLE public.book_score
 (

@@ -88,6 +88,15 @@ class UserService {
         };
     }
 
+    async isBookAvailableForBorrowing(bookId: number): Promise<boolean> {
+        const bookBorrowHistoryRepository = AppDataSource.getRepository(BookBorrowHistory);
+        const bookBorrowHistory = await bookBorrowHistoryRepository.findOneBy({
+            book: { id: bookId },
+            returned: false
+        });
+        return bookBorrowHistory ? false : true;
+    }
+
     async getNotReturnedBookBorrowHistory(bookId: number, userId: number): Promise<BookBorrowHistory | null> {
         const bookBorrowHistoryRepository = AppDataSource.getRepository(BookBorrowHistory);
         return await bookBorrowHistoryRepository.findOneBy({
@@ -100,8 +109,8 @@ class UserService {
     async borrowBook(bookId: number, userId: number): Promise<void> {
         const user = await this.getUserById(userId);
         const book = await BookService.getBookById(bookId);
-        const existingBookBorrowHistory = await this.getNotReturnedBookBorrowHistory(bookId, userId);
-        if (existingBookBorrowHistory) {
+        const isBookAvailableForBorrowing = await this.isBookAvailableForBorrowing(bookId);
+        if (!isBookAvailableForBorrowing) {
             throw new Error('Already Borrowed');
         }
         const bookBorrowHistoryRepository = AppDataSource.getRepository(BookBorrowHistory);
