@@ -21,21 +21,28 @@ class UserService {
         }
     }
 
-    async getNotReturnedBookBorrowHistory(bookId: number, userId: number): Promise<BookBorrowHistory> {
+    async getNotReturnedBookBorrowHistory(bookId: number, userId: number): Promise<BookBorrowHistory | null> {
         const bookBorrowHistoryRepository = AppDataSource.getRepository(BookBorrowHistory);
-        const bookBorrowHistory = await bookBorrowHistoryRepository.findOneBy({
+        return await bookBorrowHistoryRepository.findOneBy({
             book: { id: bookId },
-            user: { id: userId }
+            user: { id: userId },
+            returned: false
         });
-        if (bookBorrowHistory) {
-            if (bookBorrowHistory.returned) {
-                throw new Error('Already Returned');
-            } else {
-                return bookBorrowHistory;
-            }
-        } else {
-            throw new Error('Not Found');
+    }
+
+    async borrowBook(bookId: number, userId: number): Promise<void> {
+        const user = await this.getUserById(userId);
+        const book = await BookService.getBookById(bookId);
+        const existingBookBorrowHistory = await this.getNotReturnedBookBorrowHistory(bookId, userId);
+        if (existingBookBorrowHistory) {
+            throw new Error('Already Borrowed');
         }
+        const bookBorrowHistoryRepository = AppDataSource.getRepository(BookBorrowHistory);
+        const bookBorrowHistory = new BookBorrowHistory();
+        bookBorrowHistory.book = book;
+        bookBorrowHistory.user = user;
+        bookBorrowHistory.returned = false;
+        await bookBorrowHistoryRepository.save(bookBorrowHistory);
     }
 
     // It is better to consider thread-safety in this method.
@@ -55,6 +62,9 @@ class UserService {
         const user = await this.getUserById(userId);
         const book = await BookService.getBookById(bookId);
         const bookBorrowHistory = await this.getNotReturnedBookBorrowHistory(bookId, userId);
+        if (!bookBorrowHistory) {
+            throw new Error('Not Borrowed');
+        }
         // DB change-1
         bookBorrowHistory.returned = true;
         // DB change-2

@@ -80,20 +80,7 @@ router.post('/', async (req: Request, res: Response) => {
 router.post('/:userId/borrow/:bookId', async (req: Request, res: Response) => {
     const userId = parseInt(req.params.userId);
     const bookId = parseInt(req.params.bookId);
-    const userRepository = AppDataSource.getRepository(User);
-    const bookRepository = AppDataSource.getRepository(Book);
-    const bookBorrowHistoryRepository = AppDataSource.getRepository(BookBorrowHistory);
-    const user = await userRepository.findOneBy({ id: userId });
-    const book = await bookRepository.findOneBy({ id: bookId });
-    const bookBorrowHistory = new BookBorrowHistory();
-    if (book != null) { // todo: resolve this and remove
-        bookBorrowHistory.book = book;
-    }
-    if (user != null) { // todo: resolve this and remove
-        bookBorrowHistory.user = user;
-    }
-    bookBorrowHistory.returned = false;
-    await bookBorrowHistoryRepository.save(bookBorrowHistory);
+    await UserService.borrowBook(bookId, userId);
     res.json();
 });
 
@@ -102,39 +89,6 @@ router.post('/:userId/return/:bookId', async (req: Request, res: Response) => {
     const bookId = parseInt(req.params.bookId);
     const score = parseInt(req.body.score);
     await UserService.returnBook(bookId, userId, score);
-    // const userRepository = AppDataSource.getRepository(User);
-    // const bookRepository = AppDataSource.getRepository(Book);
-    // const bookBorrowHistoryRepository = AppDataSource.getRepository(BookBorrowHistory);
-    // const bookScoreRepository = AppDataSource.getRepository(BookScore);
-    // const user = await userRepository.findOneBy({ id: userId });
-    // const book = await bookRepository.findOneBy({ id: bookId });
-    // // update book borrow history
-    // const bookBorrowHistory = await bookBorrowHistoryRepository.findOneBy({ book: { id: bookId }, user: { id: userId } });
-    // if (bookBorrowHistory != null) { // todo: resolve this and remove
-    //     bookBorrowHistory.returned = true;
-    //     await bookBorrowHistoryRepository.save(bookBorrowHistory);
-    // }
-    // // insert book score
-    // const bookScore = new BookScore();
-    // if (book != null) { // todo: resolve this and remove
-    //     bookScore.book = book;
-    // }
-    // if (user != null) { // todo: resolve this and remove
-    //     bookScore.user = user;
-    // }
-    // bookScore.score = score;
-    // await bookScoreRepository.save(bookScore);
-    // // update book for new score
-    // let sumOfScores = 0;
-    // const bookScores = await bookScoreRepository.findBy({ book: { id: bookId } });
-    // bookScores.forEach(item => {
-    //     sumOfScores += item.score;
-    // });
-    // const newScore = sumOfScores / bookScores.length;
-    // if (book != null) { // todo: resolve this and remove
-    //     book.score = newScore;
-    //     await bookRepository.save(book);
-    // }
     res.json();
 });
 
